@@ -1,0 +1,22 @@
+# Backup files
+*-backup.html
+index-v8-backup.html
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+/tmp/
+temp/
