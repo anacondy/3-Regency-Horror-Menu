@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regency Horror Menu</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { margin: 0; background-color: #050505; }
+        
+        /* Scrollbar Hiding Hack */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        /**
+         * 📜 FEATURE REGISTRY 📜
+         * ------------------------------------------------------------------
+         * Trace of added/modified features to maintain project integrity.
+         * Protocol: C+O+2 (Origin: Digital Denim OS).
+         * Versioning: Natural Numbers.
+         * * [1]..[16] - Previous Versions.
+         * [17] - Ghost Synth Engine: Implemented Web Audio API fallback.
+         * If external MP3s fail (due to CORS/Sandbox), the system now 
+         * mathematically generates a spooky Am drone in-browser.
+         * ------------------------------------------------------------------
+         */
+        const FEATURE_REGISTRY = {
+          version: 17,
+          date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
+          features: [
+            "Regency Atmosphere",
+            "Smart Animation",
+            "Frost Glass UI",
+            "Scarlet Cursive Editor",
+            "Live Syntax Highlighting (Vibrant Green)",
+            "Secret Registry (C+O+2) [Protocol Confirmed]",
+            "Clean UI (No Scrollbars)",
+            "Static Mode (Read-Only)",
+            "Grid Layout System",
+            "Midnight Waltz Visualizer",
+            "Ghost Synth Engine (Web Audio API)"
+          ]
+        };
+
+        // --- SVG Filters ---
+        const GrungeFilters = () => (
+          <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+            <defs>
+              <filter id="grunge-filter-1">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+              <filter id="grunge-filter-2">
+                <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="4" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="15" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+            </defs>
+          </svg>
+        );
+
+        // --- Secret Registry Modal ---
+        const RegistryModal = ({ onClose }) => {
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm animate-[fadeIn_0.5s_ease-out]">
+              <div 
+                className="relative max-w-lg w-full p-8 border border-stone-700 bg-[#0a0a0a] shadow-[0_0_50px_rgba(255,255,255,0.1)]"
+                style={{ fontFamily: '"Courier New", monospace' }} 
+              >
+                <button onClick={onClose} className="absolute top-4 right-4 text-stone-500 hover:text-white">[X]</button>
+                <h3 className="text-emerald-500 text-xl mb-6 tracking-widest uppercase border-b border-stone-800 pb-2">System Registry</h3>
+                <div className="space-y-4 text-stone-300 text-sm">
+                  <div className="flex justify-between"><span className="text-stone-500">Version_ID:</span><span className="text-white">{FEATURE_REGISTRY.version}</span></div>
+                  <div className="flex justify-between"><span className="text-stone-500">Creation_Date:</span><span className="text-white">{FEATURE_REGISTRY.date}</span></div>
+                  <div className="flex justify-between"><span className="text-stone-500">Protocol:</span><span className="text-emerald-400">C+O+2 (Active)</span></div>
+                  <div className="mt-6">
+                    <span className="text-stone-500 block mb-2">Installed_Modules:</span>
+                    <ul className="space-y-1 border-l border-stone-800 pl-4">
+                      {FEATURE_REGISTRY.features.map((feat, i) => (
+                        <li key={i} className="text-stone-400 hover:text-emerald-400 transition-colors">{`> ${feat}`}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                <div className="mt-8 text-center text-[10px] text-stone-700 uppercase tracking-[0.5em]">Read Only Memory</div>
+              </div>
+            </div>
+          );
+        };
+
+        // --- Menu Strip ---
+        const MenuStrip = ({ text, delay, index, onClick }) => {
+          const [showText, setShowText] = useState(false);
+          useEffect(() => {
+            const timer = setTimeout(() => { setShowText(true); }, delay);
+            return () => clearTimeout(timer);
+          }, [delay]);
+
+          const filterId = `url(#grunge-filter-${(index % 3) + 1})`;
+
+          return (
+            <div onClick={onClick} className="relative group cursor-pointer w-full max-w-2xl mx-auto mb-8 transition-transform duration-500 hover:scale-[1.02]">
+              <div className="relative h-24 w-full overflow-visible transition-all duration-700 ease-out bg-white/5 backdrop-blur-[8px] border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]"
+                style={{ filter: filterId, clipPath: 'polygon(2% 4%, 98% 2%, 99% 96%, 1% 98%)', opacity: 0, animation: `fadeInStrip 1s ease-out forwards ${index * 0.2}s` }}>
+                <div className="absolute inset-0 bg-black opacity-[0.1] mix-blend-overlay pointer-events-none"></div>
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <h2 className={`text-3xl md:text-5xl font-serif tracking-widest uppercase text-gray-300 transition-all duration-[2000ms] ease-in-out group-hover:text-white group-hover:text-shadow-[0_0_15px_rgba(255,255,255,0.7)] ${showText ? 'opacity-90 blur-0 translate-y-0' : 'opacity-0 blur-sm translate-y-2'}`}
+                  style={{ fontFamily: '"Playfair Display", serif', textShadow: '0px 0px 5px rgba(0,0,0,0.8)' }}>{text}</h2>
+              </div>
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500 bg-white/20 mix-blend-overlay pointer-events-none" style={{ filter: filterId }}></div>
+            </div>
+          );
+        };
+
+        // --- PAGE: Cursive Code Editor ---
+        const CursiveEditor = ({ onBack }) => {
+          const rawCode = `async function fetchDarkSecrets() {
+  // Get the location of the soul
+  let infoid = new URL(window.location.href);
+  const data = await getSecrets(infoid.pathname);
+  
+  // Apply the haunted effect
+  useEffect(() => {
+    // Get the HTMLCollection that holds each picture
+    const imageTags = document
+      .getElementsByClassName('article_content')[0]
+      .getElementsByTagName('img');
+
+    // Loop over the collection elements
+    for (const item of imageTags) {
+      item.style.filter = "grayscale(100%)";
+      item.onclick = () => {
+         revive(item);
+      };
+      
+      // Watch for the shadows
+      item.addEventListener('mouseenter', () => {
+        playWhispers();
+      });
+    }
+  }, []);
+
+  // Return to the void
+  return (
+    <div className="void-container">
+      {data.hasSecrets ? (
+         <Reveal secrets={data} />
+      ) : (
+         <Vanish />
+      )}
+    </div>
+  );
+}`;
+
+          const highlightLine = (text) => {
+            if (!text) return " "; 
+            let highlighted = text
+              .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+            highlighted = highlighted.replace(/(\/\/.*)/g, '<span class="text-stone-500 italic font-light opacity-80" style="text-shadow: none;">$&</span>');
+            highlighted = highlighted.replace(/\b(const|let|var|async|await|function|return|if|else|for|while|new|import|from|export|default|useEffect)\b/g, '<span class="text-cyan-400 font-medium drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]">$&</span>');
+            highlighted = highlighted.replace(/\.\w+(?=\()|\.\w+/g, '<span class="text-stone-200 italic opacity-90">$&</span>');
+            highlighted = highlighted.replace(/(['"`])(.*?)\1/g, '<span class="text-emerald-400 font-normal drop-shadow-[0_0_2px_rgba(52,211,153,0.4)]">$&</span>');
+            highlighted = highlighted.replace(/([{}()[\]=])/g, '<span class="text-white opacity-80 font-light">$&</span>');
+            return highlighted;
+          };
+
+          const lines = rawCode.split('\n');
+
+          return (
+            <div className="w-full max-w-4xl mx-auto h-[80vh] flex flex-col animate-[fadeIn_1s_ease-in-out]">
+              <div className="flex justify-between items-center mb-6 px-4">
+                <h2 className="text-3xl text-red-900/80 font-serif tracking-widest" style={{ fontFamily: '"Playfair Display"' }}>Script Editor</h2>
+                <button onClick={onBack} className="text-stone-400 hover:text-white transition-colors uppercase tracking-[0.2em] text-sm border-b border-transparent hover:border-white pb-1">Return</button>
+              </div>
+
+              <div className="relative flex-1 bg-black/40 backdrop-blur-md rounded-lg border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col">
+                <div className="flex-1 overflow-auto no-scrollbar p-4">
+                    <div className="grid grid-cols-[3rem_1fr] gap-x-4 font-mono text-lg" style={{ fontFamily: '"Cedarville Cursive", cursive' }}>
+                        {lines.map((line, i) => (
+                            <React.Fragment key={i}>
+                                <div className="text-right text-stone-600 select-none leading-8 border-r border-white/5 pr-2">{i + 1}</div>
+                                <div className="whitespace-pre-wrap break-words leading-8 text-[#d6d3d1]" dangerouslySetInnerHTML={{ __html: highlightLine(line) }} />
+                            </React.Fragment>
+                        ))}
+                    </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        // --- PAGE: The Midnight Waltz ---
+        const MidnightWaltz = ({ onBack }) => {
+            const [playing, setPlaying] = useState(false);
+            const [statusText, setStatusText] = useState("Commence Dance");
+            const [isError, setIsError] = useState(false);
+            const [sourceIndex, setSourceIndex] = useState(0);
+            const audioRef = useRef(null);
+            const synthRef = useRef(null); // Reference for Web Audio Context
+
+            const PLAYLIST = [
+                "https://ia800305.us.archive.org/23/items/CamilleSaint-sens-DanseMacabre/Saint-Saens_Danse_Macabre.mp3",
+                "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f5/Camille_Saint-Sa%C3%ABns_-_Danse_Macabre.ogg/Camille_Saint-Sa%C3%ABns_-_Danse_Macabre.ogg.mp3"
+            ];
+
+            // --- GHOST SYNTH ENGINE (Fallback) ---
+            const playGhostSynth = () => {
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioContext) return; // Browser too old
+                    
+                    const ctx = new AudioContext();
+                    const osc1 = ctx.createOscillator();
+                    const osc2 = ctx.createOscillator();
+                    const gainNode = ctx.createGain();
+                    const filter = ctx.createBiquadFilter();
+
+                    // Oscillators for a spooky dissonance
+                    osc1.type = "sine";
+                    osc1.frequency.value = 220; // A3
+                    
+                    osc2.type = "triangle";
+                    osc2.frequency.value = 224; // Detuned slightly
+
+                    // Lowpass filter for "underwater/ghost" sound
+                    filter.type = "lowpass";
+                    filter.frequency.value = 800;
+
+                    // LFO for tremolo (breathing effect)
+                    const lfo = ctx.createOscillator();
+                    lfo.type = "sine";
+                    lfo.frequency.value = 2; // 2Hz wobble
+                    const lfoGain = ctx.createGain();
+                    lfoGain.gain.value = 0.3;
+                    lfo.connect(lfoGain);
+                    lfoGain.connect(gainNode.gain);
+                    lfo.start();
+
+                    // Connections
+                    osc1.connect(filter);
+                    osc2.connect(filter);
+                    filter.connect(gainNode);
+                    gainNode.connect(ctx.destination);
+
+                    // Volume envelope
+                    gainNode.gain.setValueAtTime(0, ctx.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 2); // Slow fade in
+
+                    osc1.start();
+                    osc2.start();
+
+                    synthRef.current = { ctx, oscillators: [osc1, osc2, lfo] };
+                    console.log("Ghost Synth Active");
+                } catch (e) {
+                    console.error("Synth failed:", e);
+                }
+            };
+
+            const stopSynth = () => {
+                if (synthRef.current) {
+                    synthRef.current.oscillators.forEach(osc => osc.stop());
+                    synthRef.current.ctx.close();
+                    synthRef.current = null;
+                }
+            };
+
+            // Watch for source changes
+            useEffect(() => {
+                if (playing && audioRef.current && sourceIndex < PLAYLIST.length) {
+                    const timer = setTimeout(() => {
+                        audioRef.current.play().catch(e => {
+                            if (e.name !== 'AbortError') handleError();
+                        });
+                    }, 100);
+                    return () => clearTimeout(timer);
+                }
+            }, [sourceIndex]);
+
+            // Cleanup
+            useEffect(() => {
+                return () => stopSynth();
+            }, []);
+
+            const handlePlay = () => {
+                if (playing) {
+                    // STOP EVERYTHING
+                    if (audioRef.current) audioRef.current.pause();
+                    stopSynth();
+                    setPlaying(false);
+                    setStatusText("Commence Dance");
+                } else {
+                    // START
+                    setStatusText("Loading...");
+                    setPlaying(true);
+                    
+                    // Try HTML Audio first
+                    if (sourceIndex < PLAYLIST.length && audioRef.current) {
+                        audioRef.current.play().catch(e => {
+                            if (e.name !== 'AbortError') handleError();
+                        });
+                    } else {
+                        // Direct to Synth if we already know sources are dead
+                        playGhostSynth();
+                        setStatusText("Silence The Ghost");
+                    }
+                }
+            };
+
+            const handleError = () => {
+                if (sourceIndex < PLAYLIST.length - 1) {
+                    // Try next MP3
+                    console.warn(`Source ${sourceIndex} failed. Trying next...`);
+                    setStatusText("Switching Source...");
+                    setIsError(true);
+                    setSourceIndex(prev => prev + 1);
+                } else {
+                    // ALL MP3s FAILED -> ACTIVATE GHOST SYNTH
+                    console.warn("All sources failed. Activating Ghost Synth.");
+                    setStatusText("Summoning Audio...");
+                    
+                    // Allow UI to update before starting synth
+                    setTimeout(() => {
+                        playGhostSynth();
+                        setIsError(false);
+                        setStatusText("Silence The Ghost");
+                    }, 500);
+                    
+                    // Mark playlist as exhausted
+                    setSourceIndex(PLAYLIST.length); 
+                }
+            };
+
+            return (
+                <div className="w-full h-screen flex flex-col items-center justify-center animate-[fadeIn_1s_ease-in-out] relative">
+                    {/* Audio Element for MP3s */}
+                    {sourceIndex < PLAYLIST.length && (
+                        <audio 
+                            ref={audioRef} 
+                            src={PLAYLIST[sourceIndex]}
+                            preload="auto"
+                            loop
+                            onPlay={() => { setPlaying(true); setStatusText("Silence The Music"); setIsError(false); }}
+                            onPause={() => { 
+                                // Only update UI if we aren't switching to synth
+                                if (sourceIndex < PLAYLIST.length) {
+                                    setPlaying(false); 
+                                    setStatusText("Commence Dance"); 
+                                }
+                            }}
+                            onError={(e) => { if (playing) handleError(); }}
+                        />
+                    )}
+
+                    {/* Header */}
+                    <div className="absolute top-10 w-full max-w-4xl flex justify-between items-center px-4 z-20">
+                        <h2 className="text-3xl text-stone-300 font-serif tracking-widest" style={{ fontFamily: '"Playfair Display"' }}>
+                        The Midnight Waltz
+                        </h2>
+                        <button 
+                            onClick={onBack}
+                            className="text-stone-500 hover:text-white transition-colors uppercase tracking-[0.2em] text-sm border-b border-transparent hover:border-white pb-1"
+                        >
+                            Return
+                        </button>
+                    </div>
+
+                    {/* Visualizer */}
+                    <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+                        <div className={`transition-all duration-[3000ms] ${playing ? 'opacity-100 scale-100' : 'opacity-20 scale-90 grayscale'}`}>
+                            <div className="relative flex items-center justify-center">
+                                <div className={`absolute w-[500px] h-[500px] rounded-full border border-stone-700/30 ${playing ? 'animate-[spin_20s_linear_infinite]' : ''}`}></div>
+                                <div className={`absolute w-[400px] h-[400px] rounded-full border border-stone-600/40 border-dashed ${playing ? 'animate-[spin_15s_linear_infinite_reverse]' : ''}`}></div>
+                                <div className={`absolute w-[300px] h-[300px] rounded-full border border-stone-500/20 ${playing ? 'animate-[spin_10s_linear_infinite]' : ''}`}></div>
+                                <div className={`w-4 h-4 bg-emerald-900/50 rounded-full shadow-[0_0_50px_rgba(16,185,129,0.5)] ${playing ? 'animate-pulse' : ''}`}></div>
+                            </div>
+                        </div>
+
+                        {/* Play Button */}
+                        <button 
+                        onClick={handlePlay}
+                        className={`absolute z-30 tracking-[0.5em] text-xs uppercase border px-10 py-4 backdrop-blur-md transition-all duration-500 hover:scale-105 
+                            ${isError 
+                                ? 'border-red-900 text-red-500 bg-red-900/20' 
+                                : 'border-stone-800 text-stone-400 hover:text-emerald-400 bg-black/40 hover:bg-white/5 hover:border-emerald-900/50'
+                            }`}
+                        >
+                        {statusText}
+                        </button>
+                    </div>
+                </div>
+            )
+        }
+
+        // --- Key Listener ---
+        const SecretListener = ({ onTrigger }) => {
+          useEffect(() => {
+            let pressed = new Set();
+            let timer = null;
+            const checkCombo = () => {
+              if (pressed.has('c') && pressed.has('o') && pressed.has('2')) {
+                if (!timer) { timer = setTimeout(() => { onTrigger(); timer = null; }, 2000); }
+              } else { if (timer) { clearTimeout(timer); timer = null; } }
+            };
+            const down = (e) => { pressed.add(e.key.toLowerCase()); checkCombo(); };
+            const up = (e) => { pressed.delete(e.key.toLowerCase()); if (timer) { clearTimeout(timer); timer = null; } };
+            window.addEventListener('keydown', down); window.addEventListener('keyup', up);
+            return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); if (timer) clearTimeout(timer); };
+          }, [onTrigger]);
+          return null;
+        };
+
+        // --- Main App ---
+        function App() {
+          const [view, setView] = useState('menu');
+          const [showRegistry, setShowRegistry] = useState(false);
+          const menuItems = [
+            { text: "The Drawing Room", delay: 1500 },
+            { text: "A Study in Scarlet", delay: 2500, action: () => setView('editor') },
+            { text: "The Midnight Waltz", delay: 3500, action: () => setView('waltz') },
+            { text: "Buried Secrets", delay: 4500 },
+            { text: "Depart", delay: 5500 }
+          ];
+
+          return (
+            <div className="min-h-screen bg-[#050505] overflow-hidden relative selection:bg-emerald-900/30 selection:text-emerald-100">
+              <GrungeFilters />
+              <SecretListener onTrigger={() => setShowRegistry(true)} />
+              {showRegistry && <RegistryModal onClose={() => setShowRegistry(false)} />}
+              <div className="fixed inset-0 pointer-events-none z-0">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 animate-pulse"></div>
+                <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/80 to-black opacity-90"></div>
+                <div className="absolute inset-0 shadow-[inset_0_0_200px_rgba(0,0,0,1)]"></div>
+                <div className="absolute inset-0 overflow-hidden">
+                    {[...Array(50)].map((_, i) => (
+                        <div key={i} className="absolute rounded-full bg-white mix-blend-overlay"
+                            style={{ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%`, width: `${Math.random() * 3 + 1}px`, height: `${Math.random() * 3 + 1}px`, opacity: Math.random() * 0.5 + 0.1, animation: `float ${Math.random() * 20 + 10}s linear infinite`, animationDelay: `-${Math.random() * 20}s` }} />
+                    ))}
+                </div>
+              </div>
+
+              <main className="relative z-10 container mx-auto px-4 py-20 flex flex-col items-center justify-center min-h-screen transition-all duration-1000">
+                {view === 'menu' && (
+                    <>
+                        <header className="mb-16 text-center opacity-50 animate-[fadeIn_2s_ease-in]">
+                        <h1 className="text-stone-400 font-serif text-sm tracking-[0.5em] uppercase" style={{ fontFamily: '"Cinzel", serif' }}>Est. 1813</h1>
+                        </header>
+                        <div className="w-full flex flex-col items-center space-y-4">
+                        {menuItems.map((item, index) => (
+                            <MenuStrip key={index} index={index} text={item.text} delay={item.delay} onClick={item.action || (() => console.log(`Navigating to ${item.text}...`))} />
+                        ))}
+                        </div>
+                    </>
+                )}
+                {view === 'editor' && <CursiveEditor onBack={() => setView('menu')} />}
+                {view === 'waltz' && <MidnightWaltz onBack={() => setView('menu')} />}
+              </main>
+              <style>{`
+                @keyframes fadeInStrip { 0% { opacity: 0; transform: scaleX(0.8) translateY(10px); } 100% { opacity: 1; transform: scaleX(1) translateY(0); } }
+                @keyframes float { 0% { transform: translateY(0) translateX(0); opacity: 0; } 50% { opacity: 0.2; } 100% { transform: translateY(-100px) translateX(20px); opacity: 0; } }
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+                .text-shadow-\[0_0_15px_rgba\(255\,255\,255\,0\.7\)\] { text-shadow: 0 0 15px rgba(255, 255, 255, 0.7); }
+              `}</style>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
