@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Regency Horror Menu</title>
     
     <!-- React & ReactDOM (The Engine) -->
@@ -21,13 +24,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        body { margin: 0; background-color: #050505; }
+        body { 
+          margin: 0; 
+          background-color: #050505;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
         
         /* Scrollbar Hiding Hack */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar {
           -ms-overflow-style: none;  /* IE and Edge */
           scrollbar-width: none;  /* Firefox */
+        }
+        
+        /* Mobile Performance Optimizations */
+        button, a, .cursor-pointer {
+          -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* GPU Acceleration for animations */
+        .hw-accelerate {
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+          will-change: transform, opacity;
+        }
+        
+        /* Prevent layout shifts on mobile */
+        @media (max-width: 768px) {
+          body {
+            overflow-x: hidden;
+          }
         }
     </style>
 </head>
@@ -149,10 +176,11 @@
           return (
             <div 
               onClick={onClick}
-              className="relative group cursor-pointer w-full max-w-2xl mx-auto mb-8 transition-transform duration-500 hover:scale-[1.02]"
+              className="relative group cursor-pointer w-full max-w-2xl mx-auto mb-8 transition-transform duration-500 hover:scale-[1.02] hw-accelerate"
+              style={{ touchAction: 'manipulation' }}
             >
               <div 
-                className="relative h-24 w-full overflow-visible transition-all duration-700 ease-out bg-white/5 backdrop-blur-[8px] border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]"
+                className="relative h-24 w-full overflow-visible transition-all duration-700 ease-out bg-white/5 backdrop-blur-[8px] border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] hw-accelerate"
                 style={{ 
                   filter: filterId,
                   clipPath: 'polygon(2% 4%, 98% 2%, 99% 96%, 1% 98%)',
@@ -358,15 +386,15 @@
               {showRegistry && <RegistryModal onClose={() => setShowRegistry(false)} />}
 
               <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 animate-pulse"></div>
-                <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/80 to-black opacity-90"></div>
-                <div className="absolute inset-0 shadow-[inset_0_0_200px_rgba(0,0,0,1)]"></div>
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 animate-pulse hw-accelerate"></div>
+                <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/80 to-black opacity-90 hw-accelerate"></div>
+                <div className="absolute inset-0 shadow-[inset_0_0_200px_rgba(0,0,0,1)] hw-accelerate"></div>
 
-                <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute inset-0 overflow-hidden hw-accelerate">
                     {[...Array(50)].map((_, i) => (
                         <div 
                             key={i}
-                            className="absolute rounded-full bg-white mix-blend-overlay"
+                            className="absolute rounded-full bg-white mix-blend-overlay hw-accelerate"
                             style={{
                                 top: `${Math.random() * 100}%`,
                                 left: `${Math.random() * 100}%`,
@@ -381,7 +409,7 @@
                 </div>
               </div>
 
-              <main className="relative z-10 container mx-auto px-4 py-20 flex flex-col items-center justify-center min-h-screen transition-all duration-1000">
+              <main className="relative z-10 container mx-auto px-4 py-20 flex flex-col items-center justify-center min-h-screen transition-all duration-1000 hw-accelerate">
                 
                 {view === 'menu' && (
                     <>
@@ -413,20 +441,39 @@
 
               <style>{`
                 @keyframes fadeInStrip {
-                  0% { opacity: 0; transform: scaleX(0.8) translateY(10px); }
-                  100% { opacity: 1; transform: scaleX(1) translateY(0); }
+                  0% { opacity: 0; transform: scaleX(0.8) translateY(10px) translateZ(0); }
+                  100% { opacity: 1; transform: scaleX(1) translateY(0) translateZ(0); }
                 }
                 @keyframes float {
-                    0% { transform: translateY(0) translateX(0); opacity: 0; }
+                    0% { transform: translateY(0) translateX(0) translateZ(0); opacity: 0; }
                     50% { opacity: 0.2; }
-                    100% { transform: translateY(-100px) translateX(20px); opacity: 0; }
+                    100% { transform: translateY(-100px) translateX(20px) translateZ(0); opacity: 0; }
                 }
                 @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(10px); }
-                    to { opacity: 1; transform: translateY(0); }
+                    from { opacity: 0; transform: translateY(10px) translateZ(0); }
+                    to { opacity: 1; transform: translateY(0) translateZ(0); }
                 }
                 .text-shadow-\[0_0_15px_rgba\(255\,255\,255\,0\.7\)\] {
                   text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+                }
+                
+                /* Mobile-specific optimizations */
+                @media (max-width: 768px) {
+                  .hw-accelerate {
+                    backface-visibility: hidden;
+                    perspective: 1000px;
+                  }
+                }
+                
+                /* Performance optimization for mobile devices */
+                @media (prefers-reduced-motion: reduce) {
+                  *,
+                  *::before,
+                  *::after {
+                    animation-duration: 0s !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0s !important;
+                  }
                 }
               `}</style>
             </div>
