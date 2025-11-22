@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regency Horror Menu</title>
+    
+    <!-- React & ReactDOM (The Engine) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel (To read the code) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS (The Styling) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts (Pre-loading for speed) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { margin: 0; background-color: #050505; }
+        
+        /* Scrollbar Hiding Hack */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // --- SETUP: Destructuring React Hooks ---
+        const { useState, useEffect } = React;
+
+        /**
+         * 📜 FEATURE REGISTRY 📜
+         * ------------------------------------------------------------------
+         * Trace of added/modified features to maintain project integrity.
+         * Versioning: Natural Numbers.
+         * * [1] - Regency Atmosphere: Distressed SVG filters, grainy background.
+         * [2] - Smart Animation: Staggered text revealing on white strips.
+         * [3] - Frost Glass: Glassmorphic effect (backdrop-blur) on strips.
+         * [4] - Scarlet Editor: Cursive code editing interface added.
+         * [5] - Live Syntax: Regex-based coloring matching '$$$!!!.jpg'.
+         * [6] - Color Fix: Restored Vibrant Green/Teal text.
+         * [7] - Secret Registry: Hidden modal triggered by C+O+2 (2s hold). 
+         * [8] - Static Editor: Switched to Read-Only mode to fix scrollbar/layout.
+         * ------------------------------------------------------------------
+         */
+        const FEATURE_REGISTRY = {
+          version: 8,
+          date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
+          features: [
+            "Regency Atmosphere",
+            "Smart Animation",
+            "Frost Glass UI",
+            "Scarlet Cursive Editor",
+            "Live Syntax Highlighting (Vibrant Green)",
+            "Secret Registry (C+O+2)",
+            "Clean UI (No Scrollbars)",
+            "Static Mode (Read-Only)"
+          ]
+        };
+
+        // --- SVG Filters (Distressed/Grunge) ---
+        const GrungeFilters = () => (
+          <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+            <defs>
+              <filter id="grunge-filter-1">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+              <filter id="grunge-filter-2">
+                <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="4" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="15" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+            </defs>
+          </svg>
+        );
+
+        // --- Secret Registry Modal Component ---
+        const RegistryModal = ({ onClose }) => {
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm animate-[fadeIn_0.5s_ease-out]">
+              <div 
+                className="relative max-w-lg w-full p-8 border border-stone-700 bg-[#0a0a0a] shadow-[0_0_50px_rgba(255,255,255,0.1)]"
+                style={{ fontFamily: '"Courier New", monospace' }} 
+              >
+                <button 
+                  onClick={onClose}
+                  className="absolute top-4 right-4 text-stone-500 hover:text-white"
+                >
+                  [X]
+                </button>
+                
+                <h3 className="text-emerald-500 text-xl mb-6 tracking-widest uppercase border-b border-stone-800 pb-2">
+                  System Registry
+                </h3>
+                
+                <div className="space-y-4 text-stone-300 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-stone-500">Version_ID:</span>
+                    <span className="text-white">{FEATURE_REGISTRY.version}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-stone-500">Creation_Date:</span>
+                    <span className="text-white">{FEATURE_REGISTRY.date}</span>
+                  </div>
+                  
+                  <div className="mt-6">
+                    <span className="text-stone-500 block mb-2">Installed_Modules:</span>
+                    <ul className="space-y-1 border-l border-stone-800 pl-4">
+                      {FEATURE_REGISTRY.features.map((feat, i) => (
+                        <li key={i} className="text-stone-400 hover:text-emerald-400 transition-colors">
+                          {`> ${feat}`}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="mt-8 text-center text-[10px] text-stone-700 uppercase tracking-[0.5em]">
+                  Read Only Memory
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        // --- Menu Strip Component ---
+        const MenuStrip = ({ text, delay, index, onClick }) => {
+          const [showText, setShowText] = useState(false);
+
+          useEffect(() => {
+            const timer = setTimeout(() => {
+              setShowText(true);
+            }, delay);
+            return () => clearTimeout(timer);
+          }, [delay]);
+
+          const filterId = `url(#grunge-filter-${(index % 3) + 1})`;
+
+          return (
+            <div 
+              onClick={onClick}
+              className="relative group cursor-pointer w-full max-w-2xl mx-auto mb-8 transition-transform duration-500 hover:scale-[1.02]"
+            >
+              <div 
+                className="relative h-24 w-full overflow-visible transition-all duration-700 ease-out bg-white/5 backdrop-blur-[8px] border border-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]"
+                style={{ 
+                  filter: filterId,
+                  clipPath: 'polygon(2% 4%, 98% 2%, 99% 96%, 1% 98%)',
+                  opacity: 0,
+                  animation: `fadeInStrip 1s ease-out forwards ${index * 0.2}s`
+                }}
+              >
+                <div className="absolute inset-0 bg-black opacity-[0.1] mix-blend-overlay pointer-events-none"></div>
+              </div>
+
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <h2 
+                  className={`
+                    text-3xl md:text-5xl font-serif tracking-widest uppercase text-gray-300
+                    transition-all duration-[2000ms] ease-in-out group-hover:text-white group-hover:text-shadow-[0_0_15px_rgba(255,255,255,0.7)]
+                    ${showText ? 'opacity-90 blur-0 translate-y-0' : 'opacity-0 blur-sm translate-y-2'}
+                  `}
+                  style={{ 
+                    fontFamily: '"Playfair Display", serif',
+                    textShadow: '0px 0px 5px rgba(0,0,0,0.8)'
+                  }}
+                >
+                  {text}
+                </h2>
+              </div>
+              
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500 bg-white/20 mix-blend-overlay pointer-events-none" style={{ filter: filterId }}></div>
+            </div>
+          );
+        };
+
+        // --- Cursive Code Editor Component ---
+        const CursiveEditor = ({ onBack }) => {
+          // Static code content
+          const code = `async function fetchDarkSecrets() {
+          // Get the location of the soul
+          let infoid = new URL(window.location.href);
+          const data = await getSecrets(infoid.pathname);
+          
+          // Apply the haunted effect
+          useEffect(() => {
+            // Get the HTMLCollection that holds each picture
+            const imageTags = document
+              .getElementsByClassName('article_content')[0]
+              .getElementsByTagName('img');
+
+            // Loop over the collection elements
+            for (const item of imageTags) {
+              item.style.filter = "grayscale(100%)";
+              item.onclick = () => {
+                 revive(item);
+              };
+            }
+          }, []);
+        }`;
+
+          // Refined Syntax Highlighting
+          const highlightCode = (text) => {
+            let highlighted = text
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;");
+
+            highlighted = highlighted.replace(
+              /(\/\/.*)/g,
+              '<span class="text-stone-500 italic font-light opacity-80" style="text-shadow: none;">$&</span>'
+            );
+
+            highlighted = highlighted.replace(
+              /\b(const|let|var|async|await|function|return|if|else|for|while|new|import|from|export|default|useEffect)\b/g,
+              '<span class="text-cyan-400 font-medium drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]">$&</span>'
+            );
+
+            highlighted = highlighted.replace(
+              /\.\w+(?=\()|\.\w+/g,
+              '<span class="text-stone-200 italic opacity-90">$&</span>'
+            );
+
+            highlighted = highlighted.replace(
+              /(['"`])(.*?)\1/g,
+              '<span class="text-emerald-400 font-normal drop-shadow-[0_0_2px_rgba(52,211,153,0.4)]">$&</span>'
+            );
+
+            highlighted = highlighted.replace(
+              /([{}()[\]=])/g,
+              '<span class="text-white opacity-80 font-light">$&</span>'
+            );
+
+            return highlighted;
+          };
+
+          return (
+            <div className="w-full max-w-4xl mx-auto h-[80vh] flex flex-col animate-[fadeIn_1s_ease-in-out]">
+              <div className="flex justify-between items-center mb-6 px-4">
+                <h2 className="text-3xl text-red-900/80 font-serif tracking-widest" style={{ fontFamily: '"Playfair Display"' }}>
+                   Script Editor
+                </h2>
+                <button 
+                    onClick={onBack}
+                    className="text-stone-400 hover:text-white transition-colors uppercase tracking-[0.2em] text-sm border-b border-transparent hover:border-white pb-1"
+                >
+                    Return
+                </button>
+              </div>
+
+              <div className="relative flex-1 bg-black/40 backdrop-blur-md rounded-lg border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
+                
+                {/* Line Numbers Bar */}
+                <div className="absolute left-0 top-0 bottom-0 w-12 bg-black/20 border-r border-white/5 flex flex-col items-end pt-4 pr-3 text-stone-600 font-mono text-lg select-none" style={{ fontFamily: '"Cedarville Cursive", cursive' }}>
+                  {code.split('\n').map((_, i) => (
+                    <div key={i} className="leading-8">{i + 1}</div>
+                  ))}
+                </div>
+
+                {/* The Editing "Stage" - Using 'no-scrollbar' utility */}
+                <div className="absolute left-12 top-0 right-0 bottom-0 overflow-auto no-scrollbar p-4">
+                    <div className="relative min-h-full">
+                        <pre 
+                            className="absolute inset-0 whitespace-pre-wrap break-words leading-8 pl-2 m-0 border-0 pointer-events-none"
+                            style={{ 
+                                fontFamily: '"Cedarville Cursive", cursive', 
+                                fontSize: '1.4rem',
+                                color: '#d6d3d1' 
+                            }}
+                            dangerouslySetInnerHTML={{ __html: highlightCode(code) }}
+                        />
+                    </div>
+                </div>
+              </div>
+               <div className="mt-2 text-center text-stone-600 text-xs tracking-widest uppercase">
+                  JavaScript (React) • PyCharm Compatible • Read Only
+               </div>
+            </div>
+          );
+        };
+
+        // --- Keyboard Listener for Secret Registry ---
+        const SecretListener = ({ onTrigger }) => {
+          useEffect(() => {
+            let pressed = new Set();
+            let timer = null;
+
+            const checkCombo = () => {
+              // Check for C + O + 2
+              if (pressed.has('c') && pressed.has('o') && pressed.has('2')) {
+                if (!timer) {
+                  timer = setTimeout(() => {
+                    onTrigger();
+                    timer = null;
+                  }, 2000); // 2 seconds hold
+                }
+              } else {
+                if (timer) {
+                  clearTimeout(timer);
+                  timer = null;
+                }
+              }
+            };
+
+            const down = (e) => {
+              pressed.add(e.key.toLowerCase());
+              checkCombo();
+            };
+
+            const up = (e) => {
+              pressed.delete(e.key.toLowerCase());
+              if (timer) {
+                clearTimeout(timer);
+                timer = null;
+              }
+            };
+
+            window.addEventListener('keydown', down);
+            window.addEventListener('keyup', up);
+            return () => {
+              window.removeEventListener('keydown', down);
+              window.removeEventListener('keyup', up);
+              if (timer) clearTimeout(timer);
+            };
+          }, [onTrigger]);
+
+          return null;
+        };
+
+        function App() {
+          const [view, setView] = useState('menu');
+          const [showRegistry, setShowRegistry] = useState(false);
+
+          const menuItems = [
+            { text: "The Drawing Room", delay: 1500 },
+            { text: "A Study in Scarlet", delay: 2500, action: () => setView('editor') },
+            { text: "The Midnight Waltz", delay: 3500 },
+            { text: "Buried Secrets", delay: 4500 },
+            { text: "Depart", delay: 5500 }
+          ];
+
+          return (
+            <div className="min-h-screen bg-[#050505] overflow-hidden relative selection:bg-emerald-900/30 selection:text-emerald-100">
+              <GrungeFilters />
+              <SecretListener onTrigger={() => setShowRegistry(true)} />
+              
+              {/* Registry Modal */}
+              {showRegistry && <RegistryModal onClose={() => setShowRegistry(false)} />}
+
+              <div className="fixed inset-0 pointer-events-none z-0">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 animate-pulse"></div>
+                <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/80 to-black opacity-90"></div>
+                <div className="absolute inset-0 shadow-[inset_0_0_200px_rgba(0,0,0,1)]"></div>
+
+                <div className="absolute inset-0 overflow-hidden">
+                    {[...Array(50)].map((_, i) => (
+                        <div 
+                            key={i}
+                            className="absolute rounded-full bg-white mix-blend-overlay"
+                            style={{
+                                top: `${Math.random() * 100}%`,
+                                left: `${Math.random() * 100}%`,
+                                width: `${Math.random() * 3 + 1}px`,
+                                height: `${Math.random() * 3 + 1}px`,
+                                opacity: Math.random() * 0.5 + 0.1,
+                                animation: `float ${Math.random() * 20 + 10}s linear infinite`,
+                                animationDelay: `-${Math.random() * 20}s`
+                            }}
+                        />
+                    ))}
+                </div>
+              </div>
+
+              <main className="relative z-10 container mx-auto px-4 py-20 flex flex-col items-center justify-center min-h-screen transition-all duration-1000">
+                
+                {view === 'menu' && (
+                    <>
+                        <header className="mb-16 text-center opacity-50 animate-[fadeIn_2s_ease-in]">
+                        <h1 className="text-stone-400 font-serif text-sm tracking-[0.5em] uppercase" style={{ fontFamily: '"Cinzel", serif' }}>
+                            Est. 1813
+                        </h1>
+                        </header>
+
+                        <div className="w-full flex flex-col items-center space-y-4">
+                        {menuItems.map((item, index) => (
+                            <MenuStrip 
+                                key={index} 
+                                index={index}
+                                text={item.text} 
+                                delay={item.delay}
+                                onClick={item.action || (() => console.log(`Navigating to ${item.text}...`))}
+                            />
+                        ))}
+                        </div>
+                    </>
+                )}
+
+                {view === 'editor' && (
+                    <CursiveEditor onBack={() => setView('menu')} />
+                )}
+
+              </main>
+
+              <style>{`
+                @keyframes fadeInStrip {
+                  0% { opacity: 0; transform: scaleX(0.8) translateY(10px); }
+                  100% { opacity: 1; transform: scaleX(1) translateY(0); }
+                }
+                @keyframes float {
+                    0% { transform: translateY(0) translateX(0); opacity: 0; }
+                    50% { opacity: 0.2; }
+                    100% { transform: translateY(-100px) translateX(20px); opacity: 0; }
+                }
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .text-shadow-\[0_0_15px_rgba\(255\,255\,255\,0\.7\)\] {
+                  text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+                }
+              `}</style>
+            </div>
+          );
+        }
+
+        // Render the App
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
